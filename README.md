@@ -43,6 +43,11 @@ The example also needs some love. It's a bit rough around the edges.
 
 For now, if you want to run the example, all you need to do is clone the repository and open the `example/index.html` file in your browser.
 
+The existing implementation serves as a proof of concept. However, we anticipate a few enhancements in the near future to refine the project:
+
+1. Transition to Web Components: We plan to adopt Web Components to enhance the modularity and reusability of our code.
+2. Refactor API Exposure: Currently, the API is exposed via the `window` object. We aim to revise this approach for a more encapsulated and secure method of API exposure.
+
 ## Sonner API
 
 The Sonner API is very simple and consists of a few methods:
