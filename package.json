@@ -1,0 +1,34 @@
+{
+  "name": "sonner-js",
+  "version": "0.0.1",
+  "description": "Sonner is an opinionated toast component.",
+  "main": "src/sonner.js",
+  "directories": {
+    "example": "example"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prepare": "uglifyjs src/sonner.js -o dist/sonner.min.js && uglifycss src/sonner.css --output dist/sonner.min.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fernandojpps/sonner-js.git"
+  },
+  "keywords": [
+    "sonner",
+    "vanilla",
+    "toast"
+  ],
+  "author": "Fernando Pina dos Santos",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fernandojpps/sonner-js/issues"
+  },
+  "homepage": "https://github.com/fernandojpps/sonner-js#readme",
+  "devDependencies": {
+    "uglify-js": "^3.6.0",
+    "uglifycss": "^0.0.29"
+  }
+}

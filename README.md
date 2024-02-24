@@ -29,15 +29,19 @@ Sonner.show("My first toast");
 
 Some of the features of the original Sonner component are not available in this version. These include:
 
-1. Custom toast components
-2. Promise toast
-3. TypeScript definitions
+1. Implement missing features
+   1. Custom toast components
+   2. Promise toast
+   3. TypeScript definitions
+2. Improve the example
+3. Add tests
+4. Add CI/CD
 
 The intention is to implement these features in the future.
 
 The example also needs some love. It's a bit rough around the edges.
 
-If you want to run the example, all you need to do is clone the repository and open the `example/index.html` file in your browser.
+For now, if you want to run the example, all you need to do is clone the repository and open the `example/index.html` file in your browser.
 
 ## Sonner API
 
