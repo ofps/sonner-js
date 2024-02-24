@@ -119,7 +119,7 @@ Removes an element with a specific id from the DOM after a delay.
 
 ## Thanks
 
-I would like to thank [Emil Kowalski](https://emilkowalski.com/) for creating the original Sonner component and for the inspiration to create this version.
+I would like to thank [Emil Kowalski](https://emilkowal.ski/) for creating the original Sonner component and for the inspiration to create this version.
 
 ## License
 
