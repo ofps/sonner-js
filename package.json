@@ -1,6 +1,6 @@
 {
   "name": "sonner-js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Sonner is an opinionated toast component.",
   "main": "src/sonner.js",
   "directories": {
