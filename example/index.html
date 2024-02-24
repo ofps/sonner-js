@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+  <head>
+    <title>sonner-js example</title>
+    <link rel="stylesheet" href="../src/sonner.css" />
+    <script src="../src/sonner.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        Sonner.init({
+          closeButton: false,
+          richColors: false,
+          position: "bottom-center",
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+    <button onclick="Sonner.show('This is a sample toast')">Show Toast</button>
+    <button onclick="Sonner.success('This is a sample toast')">
+      Show Success Toast
+    </button>
+    <button onclick="Sonner.error('This is a sample toast')">
+      Show Error Toast
+    </button>
+    <button onclick="Sonner.warning('This is a sample toast')">
+      Show Warning Toast
+    </button>
+    <button onclick="Sonner.info('This is a sample toast')">
+      Show Info Toast
+    </button>
+  </body>
+</html>
