@@ -50,32 +50,32 @@ window.Sonner = {
    * @param {string} msg - The message to display in the toast.
    * @returns {void}
    */
-  success(msg) {
-    Sonner.show(msg, { type: "success" });
+  success(msg, opts = {}) {
+    return Sonner.show(msg, { icon: 'success', type: "success", ...opts });
   },
   /**
    * Shows a new error toast with a specific message.
    * @param {string} msg - The message to display in the toast.
    * @returns {void}
    */
-  error(msg) {
-    Sonner.show(msg, { type: "error" });
+  error(msg, opts = {}) {
+    return Sonner.show(msg, { icon: 'error', type: "error", ...opts });
   },
   /**
    * Shows a new info toast with a specific message.
    * @param {string} msg - The message to display in the toast.
    * @returns {void}
    */
-  info(msg) {
-    Sonner.show(msg, { type: "info" });
+  info(msg, opts = {}) {
+    return Sonner.show(msg, { icon: 'info', type: "info", ...opts });
   },
   /**
    * Shows a new warning toast with a specific message.
    * @param {string} msg - The message to display in the toast.
    * @returns {void}
    */
-  warning(msg) {
-    Sonner.show(msg, { type: "warning" });
+  warning(msg, opts = {}) {
+    return Sonner.show(msg, { icon: 'warning', type: "warning", ...opts });
   },
   /**
    * Shows a new toast with a specific message, description, and type.
@@ -85,9 +85,9 @@ window.Sonner = {
    * @param {string} options.description - The description to display in the toast.
    * @returns {void}
    */
-  show(msg, { description, type } = {}) {
+  show(msg, opts = {}) {
     const list = document.getElementById("sonner-toaster-list");
-    const { toast, id } = renderToast(list, msg, { description, type });
+    const { toast, id } = renderToast(list, msg, opts);
 
     // Wait for the toast to be mounted before registering swipe events
     window.setTimeout(function () {
@@ -101,8 +101,9 @@ window.Sonner = {
 
       registerSwipe(id);
       refreshProperties();
-      registerRemoveTimeout(el);
+      registerRemoveTimeout(el, opts.duration ?? TOAST_LIFETIME);
     }, 16);
+    return toast;
   },
   /**
    * Removes an element with a specific id from the DOM after a delay.
@@ -132,7 +133,7 @@ window.Sonner = {
 // Assets
 ////////////////////////
 
-const getAsset = (type) => {
+const getIcon = (type) => {
   switch (type) {
     case "success":
       return SuccessIcon;
@@ -147,7 +148,7 @@ const getAsset = (type) => {
       return ErrorIcon;
 
     default:
-      return null;
+      return undefined;
   }
 };
 
@@ -239,19 +240,19 @@ function genid() {
  * @returns {Element} toast - The toast element.
  * @returns {string} id - The unique id of the toast.
  */
-function renderToast(list, msg, { type, description }) {
+function renderToast(list, msg, opts = {}) {
   const toast = document.createElement("div");
   list.prepend(toast);
   const id = genid();
   const count = list.children.length;
-  const asset = getAsset(type);
+  const asset = getIcon(opts.icon) ?? opts.icon;
   toast.outerHTML = `<li
   aria-live="polite"
   aria-atomic="true"
   role="status"
   tabindex="0"
   data-id="${id}"
-  data-type="${type}"
+  data-type="${opts.type}"
   data-sonner-toast=""
   data-mounted="false"
   data-styled="true"
@@ -268,9 +269,8 @@ function renderToast(list, msg, { type, description }) {
   data-expanded="false"
   style="--index: 0; --toasts-before: ${0}; --z-index: ${count}; --offset: 0px; --initial-height: 0px;"
     >
-      ${
-        list.getAttribute("data-close-button") === "true"
-          ? `<button
+      ${list.getAttribute("data-close-button") === "true"
+      ? `<button
           aria-label="Close"
           data-disabled=""
           class="absolute top-0.5 right-0.5 border border-neutral-800 text-neutral-800 bg-neutral-100 rounded-sm"
@@ -292,28 +292,22 @@ function renderToast(list, msg, { type, description }) {
           </svg>
         </button>
       `
-          : ""
-      }
-      ${
-        asset
-          ? `
-    <div data-icon="" class="">
-      ${getAsset(type)}
-    </div>
-`
-          : ""
-      }
+      : ""
+    }
+      ${asset
+      ? `<div data-icon="" class="">${asset}</div>`
+      : ""
+    }
     <div 
           data-content="" 
           class="">
       <div data-title="" class="">
         ${msg}
       </div>
-      ${
-        description
-          ? `<div data-description="" class="">${description}</div>`
-          : ""
-      }
+      ${opts.description
+      ? `<div data-description="" class="">${opts.description}</div>`
+      : ""
+    }
     </div>
 </li>
    `;
@@ -325,12 +319,13 @@ function renderToast(list, msg, { type, description }) {
  * The function sets a new timeout to remove the element from its parent after a delay.
  * The timeout ensures that all CSS transitions complete before the element is removed.
  * @param {Element} el - The element to register the remove timeout for.
+ * @param {number} lifetime - How long the toast will last for
  * @returns {void}
  */
-function registerRemoveTimeout(el) {
+function registerRemoveTimeout(el, lifetime = TOAST_LIFETIME) {
   const tid = window.setTimeout(function () {
     Sonner.remove(el.getAttribute("data-id"));
-  }, TOAST_LIFETIME);
+  }, lifetime);
   el.setAttribute("data-remove-tid", tid);
 }
 
