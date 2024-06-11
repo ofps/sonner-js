@@ -12,6 +12,20 @@
           position: "bottom-center",
         });
       });
+
+      function loading() {
+        const promise = new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(Date.now())
+          }, 1_000);
+        });
+
+        Sonner.promise(promise, { 
+          loading: 'Waiting for 1s...', 
+          success: (data) => `The current time is now: ${data}`,
+          error: 'Oops! Failed :c',
+        });
+      }
     </script>
   </head>
 
@@ -28,6 +42,10 @@
     </button>
     <button onclick="Sonner.info('This is a sample toast')">
       Show Info Toast
+    </button>
+    
+    <button onclick="loading()">
+      Show Loading Toast
     </button>
   </body>
 </html>

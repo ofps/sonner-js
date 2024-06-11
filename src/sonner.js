@@ -78,6 +78,39 @@ window.Sonner = {
     return Sonner.show(msg, { icon: 'warning', type: "warning", ...opts });
   },
   /**
+   * Shows a promise loading toast
+   * @template T promise data type
+   * @param {Promise<T>} promise 
+   * @param {Object} opts options
+   * @param {string} opts.loading message to display while loading
+   * @param {string|(data : T) => string} opts.success function callback / message to show when loaded
+   * @param {string|(data : Error) => string} opts.success function callback / message to show when errored
+   */
+  promise(promise, opts = {}) {
+    const toast = Sonner.show(opts.loading ?? 'Loading...', {
+      icon: 'loading',
+      type: 'loading',
+      ...opts,
+      duration: -1,
+    });
+
+    promise
+      .then(result => {
+        // Update the message and start the timeout
+        const msg = typeof opts.success === 'string' ? opts.success : opts.success(result);
+        toast.setTitle(msg).setIcon('success').setDuration(opts.duration ?? TOAST_LIFETIME);
+        return result;
+      })
+      .catch(err => {      
+        const msg = typeof opts.error === 'string' ? opts.error : opts.error(err);
+        toast.setTitle(msg).setIcon('error').setDuration(opts.duration ?? TOAST_LIFETIME);
+        throw err;
+      });
+
+    return toast;
+  },
+
+  /**
    * Shows a new toast with a specific message, description, and type.
    * @param {string} msg - The message to display in the toast.
    * @param {Object} options - An object with the following properties:
@@ -147,12 +180,24 @@ const getIcon = (type) => {
     case "error":
       return ErrorIcon;
 
+    case 'loading':
+      return Loader;
+
     default:
       return undefined;
   }
 };
 
 const bars = Array(12).fill(0);
+
+const Loader = `
+  <div class="sonner-loading-wrapper" data-visible='${true}'>
+    <div class="sonner-spinner">
+      ${bars.map((_, i) => `<div class="sonner-loading-bar" key="spinner-bar-${i}"></div>`).join('\n')}
+    </div>
+  </div>
+`;
+
 
 const SuccessIcon = `
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" height="20" width="20">
@@ -246,6 +291,8 @@ function renderToast(list, msg, opts = {}) {
   const id = genid();
   const count = list.children.length;
   const asset = getIcon(opts.icon) ?? opts.icon;
+  
+
   toast.outerHTML = `<li
   aria-live="polite"
   aria-atomic="true"
@@ -296,7 +343,7 @@ function renderToast(list, msg, opts = {}) {
     }
       ${asset
       ? `<div data-icon="" class="">${asset}</div>`
-      : ""
+      : `<div data-icon="" class=""></div>`
     }
     <div 
           data-content="" 
@@ -311,7 +358,26 @@ function renderToast(list, msg, opts = {}) {
     </div>
 </li>
    `;
-  return { toast, id };
+   
+  return { 
+    id, 
+    toast: {
+      target: document.querySelector(`[data-id="${id}"]`),
+      setTitle: function (msg) {
+        document.querySelector(`[data-sonner-toast][data-id=${id}] [data-title]`).textContent = msg;
+        return this;
+      },
+      setIcon: function (icon) {
+        const ico = getIcon(icon) ?? '';    
+        document.querySelector(`[data-sonner-toast][data-id=${id}] [data-icon]`).innerHTML = ico;
+        return this;
+      },
+      setDuration: function(duration) {
+        registerRemoveTimeout(this.target, duration);
+        return this;
+      } 
+    }
+};
 }
 
 /**
@@ -323,7 +389,16 @@ function renderToast(list, msg, opts = {}) {
  * @returns {void}
  */
 function registerRemoveTimeout(el, lifetime = TOAST_LIFETIME) {
-  const tid = window.setTimeout(function () {
+  if (lifetime < 0) return;
+  if (!el.getAttribute("data-id")) 
+    throw new Error('invalid target for removal');
+
+  // Clear previous duration
+  if (el.getAttribute("data-remove-tid"))
+    window.clearTimeout(el.getAttribute("data-remove-tid"));
+
+  // Set new timeout
+  const tid = window.setTimeout(() => {
     Sonner.remove(el.getAttribute("data-id"));
   }, lifetime);
   el.setAttribute("data-remove-tid", tid);
