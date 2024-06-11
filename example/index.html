@@ -13,15 +13,16 @@
         });
       });
 
-      function loading() {
-        const promise = new Promise((resolve) => {
+      function loading(fail) {
+        const promise = new Promise((resolve, reject) => {
           setTimeout(() => {
+            if (fail) reject(new Error('OH NO!'));
             resolve(Date.now())
-          }, 1_000);
+          }, 2_500);
         });
 
         Sonner.promise(promise, { 
-          loading: 'Waiting for 1s...', 
+          loading: 'Waiting for 2.5s...', 
           success: (data) => `The current time is now: ${data}`,
           error: 'Oops! Failed :c',
         });
@@ -44,8 +45,11 @@
       Show Info Toast
     </button>
     
-    <button onclick="loading()">
+    <button onclick="loading(true)">
       Show Loading Toast
+    </button>
+    <button onclick="loading(false)">
+      Show Loading Failure Toast
     </button>
   </body>
 </html>

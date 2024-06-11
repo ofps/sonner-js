@@ -363,8 +363,10 @@ function renderToast(list, msg, opts = {}) {
     id, 
     toast: {
       target: document.querySelector(`[data-id="${id}"]`),
-      setTitle: function (msg) {
-        document.querySelector(`[data-sonner-toast][data-id=${id}] [data-title]`).textContent = msg;
+      setTitle: function (msg, raw = false) {
+        const title = document.querySelector(`[data-sonner-toast][data-id=${id}] [data-title]`);
+        if (raw)  title.innerHTML = msg;
+        else      title.textContent = msg;
         return this;
       },
       setIcon: function (icon) {
@@ -375,7 +377,11 @@ function renderToast(list, msg, opts = {}) {
       setDuration: function(duration) {
         registerRemoveTimeout(this.target, duration);
         return this;
-      } 
+      },
+      dismiss: function() {
+        Sonner.remove(this.target.getAttribute("data-id"))
+        return this;
+      }
     }
 };
 }
