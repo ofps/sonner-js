@@ -5,7 +5,7 @@
 ////////////////////////
 // Constants
 ////////////////////////
-const VISIBLE_TOASTS_AMOUNT = 3;
+const VISIBLE_TOASTS_AMOUNT = 4;
 const VIEWPORT_OFFSET = "32px";
 const TOAST_LIFETIME = 4000;
 const TOAST_WIDTH = 356;
@@ -107,7 +107,7 @@ window.Sonner = {
         throw err;
       });
 
-    return toast;
+    return promise;
   },
 
   /**
@@ -123,7 +123,7 @@ window.Sonner = {
     const { toast, id } = renderToast(list, msg, opts);
 
     // Wait for the toast to be mounted before registering swipe events
-    window.setTimeout(function () {
+    //window.setTimeout(function () {
       const el = list.children[0];
       const height = el.getBoundingClientRect().height;
 
@@ -134,8 +134,8 @@ window.Sonner = {
 
       registerSwipe(id);
       refreshProperties();
-      registerRemoveTimeout(el, opts.duration ?? TOAST_LIFETIME);
-    }, 16);
+      toast.setDuration(opts.duration ?? TOAST_LIFETIME);
+    //}, 16);
     return toast;
   },
   /**
@@ -149,6 +149,7 @@ window.Sonner = {
   remove(id) {
     const el = document.querySelector(`[data-id="${id}"]`);
     if (!el) return;
+
     el.setAttribute("data-removed", "true");
     refreshProperties();
 
@@ -375,7 +376,8 @@ function renderToast(list, msg, opts = {}) {
         return this;
       },
       setDuration: function(duration) {
-        registerRemoveTimeout(this.target, duration);
+        this.target.setAttribute('data-duration', duration);
+        registerRemoveTimeout(this.target);
         return this;
       },
       dismiss: function() {
@@ -394,10 +396,13 @@ function renderToast(list, msg, opts = {}) {
  * @param {number} lifetime - How long the toast will last for
  * @returns {void}
  */
-function registerRemoveTimeout(el, lifetime = TOAST_LIFETIME) {
-  if (lifetime < 0) return;
+function registerRemoveTimeout(el) {
   if (!el.getAttribute("data-id")) 
     throw new Error('invalid target for removal');
+
+  const lifetime = el.getAttribute('data-duration') ?? TOAST_LIFETIME;
+  if (lifetime < 0) 
+    return;
 
   // Clear previous duration
   if (el.getAttribute("data-remove-tid"))
